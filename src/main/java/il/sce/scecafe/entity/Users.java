@@ -1,9 +1,8 @@
 package il.sce.scecafe.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+
+import javax.persistence.*;
+import java.util.List;
 
 @Entity
 public class Users {
@@ -18,7 +17,11 @@ public class Users {
     private String firstname;
     private String lastname;
     private String email;
-    private String role;
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(name="users_roles",
+        joinColumns = {@JoinColumn(name = "user_id", referencedColumnName = "id")},
+        inverseJoinColumns = {@JoinColumn(name = "role_id", referencedColumnName = "id")})
+    private List<Role> roles;
 
     public Long getId() {
         return id;
@@ -76,14 +79,6 @@ public class Users {
         this.email = email;
     }
 
-    public String getRole() {
-        return role;
-    }
-
-    public void setRole(String role) {
-        this.role = role;
-    }
-
     public String getPhoneNumber() {
         return phoneNumber;
     }
@@ -92,7 +87,15 @@ public class Users {
         this.phoneNumber = phoneNumber;
     }
 
-    public Users(Long id, String login, String password, String birthDay, String firstname, String lastname, String email, String phoneNumber, String role) {
+    public List<Role> getRoles() {
+        return roles;
+    }
+
+    public void setRoles(List<Role> roles) {
+        this.roles = roles;
+    }
+
+    public Users(Long id, String login, String password, String birthDay, String firstname, String lastname, String email, String phoneNumber, List<Role> roles) {
         this.id = id;
         this.login = login;
         this.password = password;
@@ -101,7 +104,29 @@ public class Users {
         this.lastname = lastname;
         this.email = email;
         this.phoneNumber = phoneNumber;
-        this.role = role;
+        this.roles = roles;
+    }
+
+    public Users(String login, String password, String birthDay, String firstname, String lastname, String email, String phoneNumber, List<Role> roles) {
+        this.login = login;
+        this.password = password;
+        this.birthDay = birthDay;
+        this.firstname = firstname;
+        this.lastname = lastname;
+        this.email = email;
+        this.phoneNumber = phoneNumber;
+        this.roles = roles;
+    }
+
+    public Users(Users newUser) {
+        this.login = newUser.login;
+        this.password = newUser.password;
+        this.birthDay = newUser.birthDay;
+        this.firstname = newUser.firstname;
+        this.lastname = newUser.lastname;
+        this.email = newUser.email;
+        this.phoneNumber = newUser.phoneNumber;
+        this.roles = newUser.roles;
     }
 
     private String phoneNumber;

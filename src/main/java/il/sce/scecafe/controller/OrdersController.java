@@ -1,39 +1,54 @@
 package il.sce.scecafe.controller;
 
-import il.sce.scecafe.entity.Item;
 import il.sce.scecafe.entity.Orders;
 import il.sce.scecafe.entity.Position;
-import il.sce.scecafe.repository.ItemRepository;
 import il.sce.scecafe.repository.OrdersRepository;
-import jakarta.persistence.EntityManager;
-import org.springframework.data.jpa.repository.Query;
+import il.sce.scecafe.repository.PositionRepository;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
+import javax.persistence.EntityManager;
 import java.util.*;
 
 @RestController
-@CrossOrigin(origins = {"*"}, maxAge = 2400, allowCredentials = "false")
 @RequestMapping("/orders")
 public class OrdersController {
-    private EntityManager entityManager;
 
     private final OrdersRepository ordersRepository;
+    private final PositionRepository positionRepository;
 
-    public OrdersController(OrdersRepository ordersRepository) {
+    public OrdersController(OrdersRepository ordersRepository, PositionRepository positionRepository) {
         this.ordersRepository = ordersRepository;
+        this.positionRepository = positionRepository;
     }
 
     @GetMapping("/")
-    public ResponseEntity getAllItems(){
-        return ResponseEntity.ok(this.ordersRepository.findAll());
+    public List<Orders> getAllOrders(){
+        return this.ordersRepository.findAll();
+    }
+
+    @GetMapping("/preparing")
+    public List<Orders> getPreparing(){
+        return this.ordersRepository.findByStatus("paid");
+    }
+
+    @PostMapping("/done")
+    public ResponseEntity setDone(@RequestParam Long id){
+        this.ordersRepository.findById(id).get().setStatus("done");
+        return ResponseEntity.status(201).body(this.ordersRepository.save(this.ordersRepository.getReferenceById(id)));
+    }
+
+    @PostMapping("/clear")
+    public ResponseEntity clearOrder(@RequestParam Long id){
+        for (Position position: this.ordersRepository.findById(id).get().getPositions()){
+            this.positionRepository.deleteById(position.getId());
+        }
+        return ResponseEntity.status(201).body("OK");
     }
 
     @GetMapping("{id}")
     public List getOrder(@PathVariable Long id){
         List result = new ArrayList();
         Orders order = ordersRepository.findById(id).get();
-        int i = 0;
         for(Position position: order.getPositions()){
             Map row = new HashMap();
             row.put("itemID",position.getItem().getId());
@@ -48,14 +63,12 @@ public class OrdersController {
 
     @GetMapping("get-current/{userID}")
     public Long getCurrent(@PathVariable Long userID){
-        for (Orders order:this.ordersRepository.findAll()){
-            if (order.getUserID() == userID)
-                if (order.getStatus().equals("new"))
-                    return order.getId();
+        for (Orders order: this.ordersRepository.findByUserID(userID)){
+            if (order.getStatus().equals("new"))
+                return order.getId();
         }
         //Create new order, if we can't find exist new order
         Orders newOrder = new Orders(userID, "new");
-        System.out.println(newOrder);
         return this.ordersRepository.save(newOrder).getId();
     }
 
@@ -63,16 +76,13 @@ public class OrdersController {
     public List getInProgress(@PathVariable Long userID){
         List result = new ArrayList();
         Long id = 0L;
-        for (Orders order: ordersRepository.findAll()){
-            if (order.getUserID().equals(userID)){
-                if (order.getStatus().equals("paid")){
-                    id = order.getId();
-                }
+        for (Orders order: this.ordersRepository.findByUserID(userID)){
+            if (order.getStatus() == "paid"){
+                id = order.getId();
             }
         }
         if (id != 0L){
         Orders order = ordersRepository.findById(id).get();
-        int i = 0;
         for(Position position: order.getPositions()){
             Map row = new HashMap();
             row.put("itemID",position.getItem().getId());
@@ -84,15 +94,18 @@ public class OrdersController {
         }}
         return result;
     }
-
+    //http://localhost:8080/orders/ POST
     @PostMapping
-    public ResponseEntity createItem(@RequestBody Orders orders) {
+    public ResponseEntity createOrder(@RequestBody Orders orders) {
         return ResponseEntity.status(201).body(this.ordersRepository.save(orders));
     }
 
-    @PostMapping("paid/{orderID}")
-    public ResponseEntity toPaid(@PathVariable Long orderID){
-        this.ordersRepository.getReferenceById(orderID).setStatus("paid");
-        return ResponseEntity.status(201).body(this.ordersRepository.save(this.ordersRepository.getReferenceById(orderID)));
+    @PostMapping("paid")
+    public ResponseEntity toPaid(@RequestBody Orders order){
+        this.ordersRepository.getReferenceById(order.getId()).setStatus("paid");
+        this.ordersRepository.getReferenceById(order.getId()).setUserID(order.getUserID());
+        if (order.getBaristaID() != null)
+            this.ordersRepository.getReferenceById(order.getId()).setBaristaID(order.getBaristaID());
+        return ResponseEntity.status(201).body(this.ordersRepository.save(this.ordersRepository.getReferenceById(order.getId())));
     }
 }

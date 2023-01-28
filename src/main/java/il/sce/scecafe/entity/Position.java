@@ -1,6 +1,6 @@
 package il.sce.scecafe.entity;
 
-import jakarta.persistence.*;
+import javax.persistence.*;
 
 @Entity
 public class Position {

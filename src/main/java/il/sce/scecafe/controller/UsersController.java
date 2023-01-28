@@ -1,34 +1,31 @@
 package il.sce.scecafe.controller;
 
-import com.fasterxml.jackson.core.JsonToken;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.util.JSONPObject;
-import il.sce.scecafe.entity.Orders;
-import il.sce.scecafe.entity.Position;
 import il.sce.scecafe.entity.Users;
+import il.sce.scecafe.repository.RoleRepository;
 import il.sce.scecafe.repository.UsersRepository;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.web.bind.annotation.*;
 
-import java.lang.reflect.Array;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 @RestController
-@CrossOrigin(origins = {"*"}, maxAge = 2400, allowCredentials = "false")
 @RequestMapping("/users")
 public class UsersController {
     private final UsersRepository usersRepository;
+    private final RoleRepository roleRepository;
 
-    public UsersController(UsersRepository usersRepository) {
+    public UsersController(UsersRepository usersRepository, RoleRepository roleRepository) {
         this.usersRepository = usersRepository;
+        this.roleRepository = roleRepository;
     }
 
     @GetMapping
-    public ResponseEntity getAllItems(){
+    public ResponseEntity getAllUsers(){
         return ResponseEntity.ok(this.usersRepository.findAll());
+    }
+
+    @GetMapping("isLogged")
+    public Boolean isLogged(){
+        return true;
     }
 
     @GetMapping("getusername/{id}")
@@ -43,30 +40,6 @@ public class UsersController {
         return usersRepository.findById(id).get();
     }
 
-    @GetMapping("checkpassword")
-    public Boolean checkPassword(@RequestParam Long id, @RequestParam String password)
-    {
-        return usersRepository.findById(id).get().getPassword().equals(password);
-    }
-
-    @GetMapping("getrole")
-    public String checkPassword(@RequestParam Long id)
-    {
-        return usersRepository.findById(id).get().getRole();
-    }
-
-    @GetMapping("{username}/{password}")
-    public Long auth(@PathVariable String username, @PathVariable String password){
-        for(Users user: this.usersRepository.findAll()){
-            if (user.getLogin().equals(username)){
-                if (user.getPassword().equals(password)){
-                    return user.getId();
-                }
-                else return 0L;
-            }
-        }
-        return 0L;
-    }
 
     @PostMapping("change")
     public void change(@RequestBody Users user){
@@ -77,10 +50,24 @@ public class UsersController {
         this.usersRepository.save(this.usersRepository.getReferenceById(user.getId()));
     }
 
+    public Users findByUsername(String login){
+        return this.usersRepository.findByLogin(login);
+    }
+
+
+    @GetMapping("/findbyphone")
+    public Users findByPhoneNumber(@RequestParam String phoneNumber){
+        return this.usersRepository.findByPhoneNumber(phoneNumber);
+    }
+
+    @GetMapping("/getrole")
+    public String getRole(@RequestParam Long id){
+        return this.usersRepository.findById(id).get().getRoles().get(0).getName();
+    }
+
     @PostMapping("change/password")
     public void changePassword(@RequestBody Users user){
-        System.out.println(user.getPassword());
-        this.usersRepository.findById(user.getId()).get().setPassword(user.getPassword());
-        this.usersRepository.save(this.usersRepository.getReferenceById(user.getId()));
+        this.usersRepository.findById(user.getId()).get().setPassword(BCrypt.hashpw(user.getPassword(),BCrypt.gensalt(4)));
+        this.usersRepository.save(this.usersRepository.getReferenceById(user.getId())); //Сохранить в Базу данных
     }
 }

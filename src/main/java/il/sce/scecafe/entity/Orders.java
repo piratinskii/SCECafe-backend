@@ -1,7 +1,8 @@
 package il.sce.scecafe.entity;
 
-import jakarta.persistence.*;
+import org.springframework.lang.Nullable;
 
+import javax.persistence.*;
 import java.util.List;
 
 @Entity
@@ -10,7 +11,7 @@ public class Orders {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(cascade = javax.persistence.CascadeType.REMOVE, orphanRemoval = true)
     @JoinColumn(name = "ordID")
     private List<Position>positions;
 
@@ -18,18 +19,28 @@ public class Orders {
         return positions;
     }
 
+    @Nullable
+    private Long baristaID = null;
     public void setPositions(List<Position> positions) {
         this.positions = positions;
+    }
+
+    public Long getBaristaID() {
+        return baristaID;
+    }
+
+    public void setBaristaID(Long baristaID) {
+        this.baristaID = baristaID;
     }
 
     public Orders(Long id, Long userID, String status) {
         this.id = id;
         this.userID = userID;
-        Status = status;
+        this.status = status;
     }
     public Orders(Long userID, String status) {
         this.userID = userID;
-        Status = status;
+        this.status = status;
     }
 
 
@@ -50,15 +61,15 @@ public class Orders {
     }
 
     public String getStatus() {
-        return Status;
+        return status;
     }
 
-    public void setStatus(String status) {
-        Status = status;
+    public void setStatus(String Status) {
+        status = Status;
     }
 
     private Long userID;
-    private String Status;
+    private String status;
 
     public Orders() {
     }

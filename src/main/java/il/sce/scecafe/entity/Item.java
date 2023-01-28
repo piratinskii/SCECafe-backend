@@ -1,31 +1,40 @@
 package il.sce.scecafe.entity;
 
-import jakarta.persistence.*;
-
+import javax.persistence.*;
 import java.util.List;
 
 @Entity
 public class Item {
-
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
-
     private String title;
     private String description;
+
+    public String getImg() {
+        return img;
+    }
+
+    public void setImg(String img) {
+        this.img = img;
+    }
+
     private String img;
     private double cost;
-    @OneToMany(mappedBy = "item")
+    @OneToMany(mappedBy = "item", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<Position> positionList;
+
+
     public Item() {
+
     }
 
     public Item(Long id, String title, String description, String img, double cost) {
         this.id = id;
         this.title = title;
         this.description = description;
-        this.img = img;
         this.cost = cost;
+        this.img = img;
     }
 
     public Long getId() {
@@ -52,13 +61,6 @@ public class Item {
         this.description = description;
     }
 
-    public String getImg() {
-        return img;
-    }
-
-    public void setImg(String img) {
-        this.img = img;
-    }
 
     public double getCost() {
         return cost;
