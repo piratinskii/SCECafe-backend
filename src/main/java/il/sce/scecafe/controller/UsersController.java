@@ -1,5 +1,4 @@
 package il.sce.scecafe.controller;
-
 import il.sce.scecafe.entity.Users;
 import il.sce.scecafe.repository.RoleRepository;
 import il.sce.scecafe.repository.UsersRepository;
@@ -40,7 +39,6 @@ public class UsersController {
         return usersRepository.findById(id).get();
     }
 
-
     @PostMapping("change")
     public void change(@RequestBody Users user){
         this.usersRepository.findById(user.getId()).get().setFirstname(user.getFirstname());
@@ -53,7 +51,6 @@ public class UsersController {
     public Users findByUsername(String login){
         return this.usersRepository.findByLogin(login);
     }
-
 
     @GetMapping("/findbyphone")
     public Users findByPhoneNumber(@RequestParam String phoneNumber){
@@ -68,6 +65,6 @@ public class UsersController {
     @PostMapping("change/password")
     public void changePassword(@RequestBody Users user){
         this.usersRepository.findById(user.getId()).get().setPassword(BCrypt.hashpw(user.getPassword(),BCrypt.gensalt(4)));
-        this.usersRepository.save(this.usersRepository.getReferenceById(user.getId())); //Сохранить в Базу данных
+        this.usersRepository.save(this.usersRepository.getReferenceById(user.getId()));
     }
 }

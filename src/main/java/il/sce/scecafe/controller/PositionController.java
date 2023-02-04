@@ -64,7 +64,7 @@ public class PositionController {
         for(Position position:this.positionRepository.findByOrdID(orderID)){
             if (Objects.equals(position.getItem().getId(),itemID)) {
                 positionRepository.deleteById(position.getId());
-                return ResponseEntity.status(201).body("Item removed");
+                return ResponseEntity.status(201).body("Position removed");
             }
         }
         return ResponseEntity.status(404).body("Position doesn't exist");

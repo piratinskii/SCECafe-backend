@@ -21,7 +21,7 @@ public class OrdersController {
         this.positionRepository = positionRepository;
     }
 
-    @GetMapping("/")
+    @GetMapping
     public List<Orders> getAllOrders(){
         return this.ordersRepository.findAll();
     }
@@ -82,19 +82,19 @@ public class OrdersController {
             }
         }
         if (id != 0L){
-        Orders order = ordersRepository.findById(id).get();
-        for(Position position: order.getPositions()){
-            Map row = new HashMap();
-            row.put("itemID",position.getItem().getId());
-            row.put("title",position.getItem().getTitle());
-            row.put("count",position.getCount());
-            row.put("cost",position.getItem().getCost());
-            row.put("sum",position.getItem().getCost()*position.getCount());
-            result.add(row);
-        }}
+            Orders order = ordersRepository.findById(id).get();
+            for(Position position: order.getPositions()){
+                Map row = new HashMap();
+                row.put("itemID",position.getItem().getId());
+                row.put("title",position.getItem().getTitle());
+                row.put("count",position.getCount());
+                row.put("cost",position.getItem().getCost());
+                row.put("sum",position.getItem().getCost()*position.getCount());
+                result.add(row);
+            }}
         return result;
     }
-    //http://localhost:8080/orders/ POST
+
     @PostMapping
     public ResponseEntity createOrder(@RequestBody Orders orders) {
         return ResponseEntity.status(201).body(this.ordersRepository.save(orders));
