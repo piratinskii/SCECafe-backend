@@ -1,4 +1,5 @@
 package il.sce.scecafe;
+import il.sce.scecafe.config.DatabaseConfigInitializer;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
@@ -18,6 +19,7 @@ public class SceCafeApplication {
     }
 
     public static void main(String[] args) {
+        DatabaseConfigInitializer.initializeDatabaseConfig();
         SpringApplication.run(SceCafeApplication.class, args);
     }
 
