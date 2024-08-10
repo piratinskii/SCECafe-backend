@@ -19,7 +19,7 @@ public class SceCafeApplication {
     }
 
     public static void main(String[] args) {
-        DatabaseConfigInitializer.main(args);
+        DatabaseConfigInitializer.initializeDatabaseConfig();
         SpringApplication.run(SceCafeApplication.class, args);
     }
 

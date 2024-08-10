@@ -10,7 +10,7 @@ import java.util.Scanner;
 public class DatabaseConfigInitializer {
     private static final String PROPERTIES_FILE_PATH = "src/main/resources/application.properties";
 
-    public static void main(String[] args) {
+    public static void initializeDatabaseConfig() {
         Properties properties = new Properties();
         try (FileInputStream input = new FileInputStream(PROPERTIES_FILE_PATH)) {
             properties.load(input);
@@ -68,7 +68,7 @@ public class DatabaseConfigInitializer {
         properties.setProperty("spring.datasource.username", username);
         properties.setProperty("spring.datasource.password", password);
 
-        try (OutputStream output = new FileOutputStream("src/main/resources/application.properties")) {
+        try (OutputStream output = new FileOutputStream(PROPERTIES_FILE_PATH)) {
             properties.store(output, null);
             System.out.println("Database configuration saved successfully!");
         } catch (IOException io) {
