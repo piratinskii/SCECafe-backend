@@ -52,16 +52,27 @@ public class AuthController {
                 throw new UsernameNotFoundException("Username " + username + " not found.");
             }
             String token = jwtTokenProvider.createToken(username, user.getRoles());
+
+
+
             Map<Object, Object> response = new HashMap<>();
+            System.out.println(username);
             response.put("username", username);
+            System.out.println("Generated JWT Token: " + token);
             response.put("token", token);
+            System.out.println("User ID: " + user.getId());
             response.put("userID", user.getId());
+            System.out.println("User role: " + user.getRoles().get(0).getName());
             response.put("role", user.getRoles().get(0).getName());
+
+            System.out.println("Response to client: " + response);
+
             return ResponseEntity.ok(response);
         } catch (AuthenticationException e) {
             throw new BadCredentialsException("Invalid login or password");
         }
     }
+
 
     public boolean addRole(Long userID, Long roleID) {
         Role newRole = this.roleRepository.findById(roleID).get();

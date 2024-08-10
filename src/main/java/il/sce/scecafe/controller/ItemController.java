@@ -115,14 +115,23 @@ public class ItemController {
     }
 
     @PostMapping("images/upload")
-    public ResponseEntity fileUpload(@RequestParam("File")MultipartFile file, @RequestParam("id")Long id) throws IOException {
-        File myFile = new File(FILE_DIRECTORY + id + ".jpg");
+    public ResponseEntity fileUpload(@RequestParam("File") MultipartFile file, @RequestParam("id") Long id) throws IOException {
+        String filename = id + ".jpg"; // Название файла
+        File myFile = new File(FILE_DIRECTORY + filename);
         myFile.createNewFile();
-        FileOutputStream fos = new FileOutputStream(myFile);
-        fos.write(file.getBytes());
-        fos.close();
+        try (FileOutputStream fos = new FileOutputStream(myFile)) {
+            fos.write(file.getBytes());
+        }
+
+        Item item = this.itemRepository.findById(id).orElse(null);
+        if (item != null) {
+            item.setImg(filename);
+            this.itemRepository.save(item);
+        }
+
         return ResponseEntity.status(201).body("OK");
     }
+
 
     private boolean checkFile(String filename){
         File file = new File (filename);
