@@ -18,49 +18,12 @@ public class DatabaseConfigInitializer {
             System.out.println("Properties file not found, creating new one...");
         }
 
-        if (properties.containsKey("spring.datasource.url") &&
-                properties.containsKey("spring.datasource.username") &&
-                properties.containsKey("spring.datasource.password")) {
-            System.out.println("Database configuration already exists. Skipping input.");
-            return;
-        }
-        Scanner scanner = new Scanner(System.in);
-
-        String defaultHost = "localhost";
-        String defaultPort = "5432";
-        String defaultDatabaseName = "postgres";
-        String defaultUsername = "postgres";
-        String defaultPassword = "postgres";
-
-        System.out.printf("Please enter the database host (default: %s): ", defaultHost);
-        String host = scanner.nextLine();
-        if (host.isEmpty()) {
-            host = defaultHost;
-        }
-
-        System.out.printf("Please enter the database port (default: %s): ", defaultPort);
-        String port = scanner.nextLine();
-        if (port.isEmpty()) {
-            port = defaultPort;
-        }
-
-        System.out.printf("Please enter the database name (default: %s): ", defaultDatabaseName);
-        String databaseName = scanner.nextLine();
-        if (databaseName.isEmpty()) {
-            databaseName = defaultDatabaseName;
-        }
-
-        System.out.printf("Please enter the database username (default: %s): ", defaultUsername);
-        String username = scanner.nextLine();
-        if (username.isEmpty()) {
-            username = defaultUsername;
-        }
-
-        System.out.printf("Please enter the database password (default: %s): ", defaultPassword);
-        String password = scanner.nextLine();
-        if (password.isEmpty()) {
-            password = defaultPassword;
-        }
+        // Заменяем интерактивный ввод на использование системных свойств
+        String host = System.getProperty("db.host", "localhost");
+        String port = System.getProperty("db.port", "5432");
+        String databaseName = System.getProperty("db.name", "postgres");
+        String username = System.getProperty("db.username", "postgres");
+        String password = System.getProperty("db.password", "postgres");
 
         String url = String.format("jdbc:postgresql://%s:%s/%s", host, port, databaseName);
 
@@ -74,7 +37,6 @@ public class DatabaseConfigInitializer {
         } catch (IOException io) {
             io.printStackTrace();
         }
-
-        scanner.close();
     }
+
 }
