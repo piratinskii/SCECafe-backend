@@ -27,6 +27,32 @@ dependencies {
     implementation 'org.springframework.security:spring-security-config'
 }
 
+task configureDatabase {
+    doLast {
+        def host = project.hasProperty('dbHost') ? project.dbHost : 'localhost'
+        def port = project.hasProperty('dbPort') ? project.dbPort : '5432'
+        def name = project.hasProperty('dbName') ? project.dbName : 'postgres'
+        def username = project.hasProperty('dbUsername') ? project.dbUsername : 'postgres'
+        def password = project.hasProperty('dbPassword') ? project.dbPassword : 'postgres'
+
+        ext.set("db.host", host)
+        ext.set("db.port", port)
+        ext.set("db.name", name)
+        ext.set("db.username", username)
+        ext.set("db.password", password)
+    }
+}
+
+bootRun {
+    dependsOn configureDatabase
+    systemProperty 'db.host', project.ext['db.host']
+    systemProperty 'db.port', project.ext['db.port']
+    systemProperty 'db.name', project.ext['db.name']
+    systemProperty 'db.username', project.ext['db.username']
+    systemProperty 'db.password', project.ext['db.password']
+}
+
 tasks.named('test') {
     useJUnitPlatform()
 }
+

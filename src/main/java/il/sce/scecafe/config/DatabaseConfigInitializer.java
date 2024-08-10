@@ -18,7 +18,8 @@ public class DatabaseConfigInitializer {
             System.out.println("Properties file not found, creating new one...");
         }
 
-        // Заменяем интерактивный ввод на использование системных свойств
+        Scanner scanner = new Scanner(System.in);
+
         String host = System.getProperty("db.host", "localhost");
         String port = System.getProperty("db.port", "5432");
         String databaseName = System.getProperty("db.name", "postgres");
@@ -37,6 +38,7 @@ public class DatabaseConfigInitializer {
         } catch (IOException io) {
             io.printStackTrace();
         }
-    }
 
+        scanner.close();
+    }
 }
