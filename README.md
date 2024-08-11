@@ -18,6 +18,7 @@ In this project you can:
    
    ```cd SCECafe-backend``` 
 
+2. Setup your Postgresql database and remember IP, Port, name of the database and credentials for the connection.
 3. Set the database information (This project works with PostgreSQL):
    For linux:
    ```
@@ -30,7 +31,7 @@ In this project you can:
    ```
    $env:DB_URL="jdbc:postgresql://localhost:5432/postgres"
    $env:DB_USERNAME="postgres"
-   $env:DB_PASSWORD="admin"
+   $env:DB_PASSWORD="postgres"
    ```
 
    Of course, change all information to your credentials.
