@@ -47,6 +47,6 @@ In this project you can:
 
 Run the server: 
 
-```./gradelew bootrun```
+```./gradlew bootrun```
 
 and use this frontend: https://github.com/piratinskii/SCECafe-frontend
